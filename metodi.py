@@ -1,3 +1,6 @@
+
+#questo è il commit del post che non ho fatto prima
+
 from flask import Flask, jsonify, request
 import mysql.connector
 
@@ -82,7 +85,6 @@ def delete_game(id):
     mydb.close()
 
     return jsonify({"message": "gioco eliminato con successo!"}), 200
-
 
 
 if __name__ == '__main__':
