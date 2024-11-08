@@ -1,6 +1,4 @@
 
-#questo è il commit del post che non ho fatto prima
-
 from flask import Flask, jsonify, request
 import mysql.connector
 
@@ -86,6 +84,38 @@ def delete_game(id):
 
     return jsonify({"message": "gioco eliminato con successo!"}), 200
 
+@app.route('/api/dati/<int:id>', methods=['PUT'])
+def update_game(id):
+    data = request.get_json()
+
+    # Verifica che tutti i campi necessari siano presenti
+    if not all(key in data for key in ('titolo', 'genere', 'piattaforma', 'data_uscita', 'sviluppatore')):
+        return jsonify({"error": "Dati mancanti"}), 400
+
+    titolo = data['titolo']
+    genere = data['genere']
+    piattaforma = data['piattaforma']
+    data_uscita = data['data_uscita']
+    sviluppatore = data['sviluppatore']
+
+    # Connessione al database e aggiornamento dei dati
+    mydb = connect_to_db()
+    mycursor = mydb.cursor()
+
+    sql = "UPDATE games SET titolo = %s, genere = %s, piattaforma = %s, data_uscita = %s, sviluppatore = %s WHERE id = %s"
+    values = (titolo, genere, piattaforma, data_uscita, sviluppatore, id)
+    mycursor.execute(sql, values)
+    mydb.commit()
+
+    # Controlla se l'update ha modificato delle righe
+    rows_affected = mycursor.rowcount
+    mycursor.close()
+    mydb.close()
+
+    if rows_affected == 0:
+        return jsonify({"message": "Gioco non trovato"}), 404
+
+    return jsonify({"message": "Gioco aggiornato con successo!"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
